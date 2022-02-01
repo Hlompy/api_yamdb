@@ -3,14 +3,14 @@ from django.db import models
 
 
 class User(AbstractUser):
-    USER = 'US'
-    MODERATOR = 'MD'
-    ADMIN = 'AD'
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
 
     USER_ROLE = (
-        (USER, 'User'),
-        (MODERATOR, 'Moderator'),
-        (ADMIN, 'Administrator'),
+        (USER, 'User role'),
+        (MODERATOR, 'Moderator role'),
+        (ADMIN, 'Administrator role'),
     )
 
     role = models.CharField(
