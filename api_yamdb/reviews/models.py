@@ -5,16 +5,17 @@ class Category(models.Model):
     """Модель категории (типа) произведения."""
     name = models.CharField(
         verbose_name='Название',
-        max_length=200,
+        max_length=256,
         unique=True,
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
-        max_length=200,
+        max_length=50,
         unique=True,
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
         constraints = [
@@ -64,7 +65,6 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         verbose_name='Дата выхода',
-        max_length=4,
         blank=True,
         null=True,
     )
