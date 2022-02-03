@@ -3,10 +3,10 @@ from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from reviews.models import Category, Review
+from reviews.models import Category, Review, Title
 
-from api.serializers import CategorySerializer
-from serializers import CommentSerializer, ReviewSerializer
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             ReviewSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
