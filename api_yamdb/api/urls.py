@@ -3,15 +3,16 @@ from rest_framework import routers
 
 from api.views import CategoryViewSet
 
-
 app_name = 'api'
 
 router_v1 = routers.DefaultRouter()
 router_v1.register(
     'categories',
     CategoryViewSet,
-    basename='category')
+    basename='category'
+)
 
 urlpatterns = [
+    path('v1/', include('users.urls')),
     path('v1/', include(router_v1.urls)),
 ]
