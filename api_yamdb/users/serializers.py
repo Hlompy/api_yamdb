@@ -16,10 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
             'role'
         )
 
-class SignupSerializer(serializers.Serializer):
+class SignupSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField(max_length=254)
     banned_names = ('me', 'admin', 'ADMIN', 'administrator', 'moderator')
+    class Meta:
+        model = User
+        fields = ('email', 'username',)
 
     def validate_username(self, data):
         if data in self.banned_names:
