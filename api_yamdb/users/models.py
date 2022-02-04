@@ -30,15 +30,23 @@ class User(AbstractUser):
     )
 
     @property
-    def token(self):
-        return self._generate_jwt_token()
+    def is_admin(self):
+        return self.role == 'admin' or self.is_superuser
 
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(days=1)
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
 
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
+    # @property
+    # def token(self):
+    #     return self._generate_jwt_token()
 
-        return token.decode('utf-8')
+    # def _generate_jwt_token(self):
+    #     dt = datetime.now() + timedelta(days=1)
+
+    #     token = jwt.encode({
+    #         'id': self.pk,
+    #         'exp': int(dt.strftime('%s'))
+    #     }, settings.SECRET_KEY, algorithm='HS256')
+
+    #     return token

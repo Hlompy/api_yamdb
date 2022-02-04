@@ -4,8 +4,9 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from reviews.models import Category, Genre, Review, Title
 
+from api.permissions import IsAdminPermission, IsAuthorOrReadOnlyPermission
 from api.serializers import (CategorySerializer, CommentSerializer,
-                             GenreSerializer, ReviewSerializer,)
+                             GenreSerializer, ReviewSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

@@ -1,10 +1,12 @@
+from api.permissions import IsAdminPermission
 from api_yamdb.settings import EMAIL_ADMIN
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -39,6 +41,7 @@ def creating_token(request):
     confirmation_code = serializer.data['confirmation_code']
     user = get_object_or_404(User, username=username)
     if default_token_generator.check_token(user, confirmation_code):
+        # print(str(user.token))
         jwt_token = RefreshToken.for_user(user)
         return Response(
             {'token': str(jwt_token.access_token)},
@@ -46,7 +49,7 @@ def creating_token(request):
         )
 
     return Response(
-        {'Неправильный код подтверждения.'},
+        {user.username: 'Неправильный код подтверждения.'},
         status=status.HTTP_400_BAD_REQUEST
     )
 
@@ -54,6 +57,7 @@ def creating_token(request):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAdminPermission,)
+    filter_backends = (filters.SearchFilter,)
     
-    def me(self, request):
-        print(request)
+    lookup_field = 'username'
