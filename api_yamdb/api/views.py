@@ -1,15 +1,15 @@
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404, render
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from reviews.models import Category, Genre, Review, Title
 
-from api.permissions import IsAdminPermission, IsAuthorOrReadOnlyPermission
-from api.serializers import (CategorySerializer, CommentSerializer,
-                             GenreSerializer, ReviewSerializer,
-                             TitleGetSerializer,
-                             TitlePostSerializer)
+from api.permissions import IsAdminPermission
+from api.serializers import (
+    CategorySerializer, CommentSerializer, GenreSerializer, ReviewSerializer,
+    TitleGetSerializer, TitlePostSerializer,
+)
+from reviews.models import Category, Genre, Review, Title
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -19,7 +19,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.reviews.all()
-    
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -31,7 +31,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         return review.comments.all()
-    
+
     def perform_create(self, serializer):
         get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         get_object_or_404(Review, pk=self.kwargs.get('review_id'))
@@ -53,6 +53,7 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     """Управление категориями произведений."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminPermission,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
@@ -63,6 +64,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
     """Управление категориями жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminPermission,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)

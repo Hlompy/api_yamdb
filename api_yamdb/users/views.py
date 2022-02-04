@@ -1,14 +1,14 @@
-from api.permissions import IsAdminPermission
-from api_yamdb.settings import EMAIL_ADMIN
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, generics, status, viewsets
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from api.permissions import IsAdminPermission
+from api_yamdb.settings import EMAIL_ADMIN
 from users.models import User
 from users.serializers import SignupSerializer, TokenSerializer, UserSerializer
 
@@ -36,6 +36,7 @@ class UserJSWTokenViewSet(viewsets.ViewSetMixin, generics.CreateAPIView):
     """Получение JSW-токена."""
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
+
     def create(self, request, *args, **kwargs):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -54,11 +55,12 @@ class UserJSWTokenViewSet(viewsets.ViewSetMixin, generics.CreateAPIView):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """Работа с пользователями."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminPermission,)
     filter_backends = (filters.SearchFilter,)
-    
+
     lookup_field = 'username'
 
     @action(

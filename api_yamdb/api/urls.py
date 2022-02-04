@@ -1,7 +1,9 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api.views import CategoryViewSet, GenreViewSet, TitleViewSet
+from api.views import (
+    CategoryViewSet, GenreViewSet, ReviewViewSet, TitleViewSet,
+)
 
 app_name = 'api'
 
@@ -18,6 +20,10 @@ router_v1.register(
     'titles',
     TitleViewSet,
     basename='title')
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews',
+    ReviewViewSet,
+    basename='review')
 
 urlpatterns = [
     path('v1/', include('users.urls')),

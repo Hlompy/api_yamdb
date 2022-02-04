@@ -4,6 +4,7 @@ from rest_framework import permissions
 class OwnerOrAdminOrModerator(permissions.BasePermission):
     pass
 
+
 class IsAuthorOrReadOnlyPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
@@ -11,8 +12,16 @@ class IsAuthorOrReadOnlyPermission(permissions.BasePermission):
                 or obj.author == request.user
                 )
 
+
 class IsAdminPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return (request.user and request.user.is_authenticated
                 and request.user.is_admin)
+
+
+class IsModeratorOrReadOnly(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return (request.user and request.user.is_authenticated
+                and request.user.is_moderator)

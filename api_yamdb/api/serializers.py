@@ -1,9 +1,9 @@
 import datetime as dt
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
-
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -61,7 +61,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
                 'Год выпуска не может быть больше текущего'
             )
         return value
-        fields = ('id', 'name', 'year', 'category', 'genre')
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -72,6 +72,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='id',
         read_only=True
     )
+
     class Meta:
         fields = '__all__'
         model = Review
