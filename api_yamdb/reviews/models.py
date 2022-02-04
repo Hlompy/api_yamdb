@@ -43,6 +43,7 @@ class Genre(models.Model):
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
         constraints = [
@@ -63,7 +64,16 @@ class Title(models.Model):
         max_length=200,
     )
     year = models.IntegerField(
-        verbose_name='Дата выхода',
+        verbose_name='Год выпуска',
+        blank=True,
+        null=True,
+    )
+    rating = models.IntegerField(
+        verbose_name='Рейтигн',
+        default=0,
+    )
+    description = models.TextField(
+        verbose_name='Описание',
         blank=True,
         null=True,
     )
@@ -82,6 +92,7 @@ class Title(models.Model):
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         constraints = [
@@ -92,7 +103,7 @@ class Title(models.Model):
         ]
 
     def __str__(self):
-        return self.name
+        return f'«{self.name}» ({self.year}) / {self.category}'
 
 
 class GenreTitle(models.Model):
