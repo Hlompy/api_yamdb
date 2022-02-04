@@ -1,12 +1,11 @@
-
 from django.shortcuts import get_object_or_404, render
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from reviews.models import Category, Review, Title
+from reviews.models import Category, Genre, Review, Title
 
 from api.serializers import (CategorySerializer, CommentSerializer,
-                             ReviewSerializer)
+                             GenreSerializer, ReviewSerializer,)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -38,8 +37,25 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class ListCreateDestroyViewSet(mixins.ListModelMixin,
+                               mixins.CreateModelMixin,
+                               mixins.DestroyModelMixin,
+                               viewsets.GenericViewSet):
+    """Вьюсет для обработки запросов GET, POST и DELETE."""
+    pass
+
+
+class CategoryViewSet(ListCreateDestroyViewSet):
     """Управление категориями произведений."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'
+
+
+class GenreViewSet(ListCreateDestroyViewSet):
+    """Управление категориями жанров."""
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'

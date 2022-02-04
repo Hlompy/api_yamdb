@@ -150,3 +150,6 @@ media/
 
 # sqlite-tools
 api_yamdb/sqlite3.exe
+
+# my_import
+api_yamdb/api/my_import.py

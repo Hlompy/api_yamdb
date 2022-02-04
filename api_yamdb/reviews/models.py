@@ -62,7 +62,6 @@ class Title(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=200,
-        unique=True,
     )
     year = models.IntegerField(
         verbose_name='Дата выхода',
@@ -86,6 +85,12 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'year', 'category'],
+                name='unique_title',
+            )
+        ]
 
     def __str__(self):
         return self.name
