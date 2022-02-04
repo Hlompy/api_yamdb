@@ -69,10 +69,10 @@ class Title(models.Model):
         blank=True,
         null=True,
     )
-    rating = models.IntegerField(
-        verbose_name='Рейтигн',
-        default=0,
-    )
+    # rating = models.IntegerField(
+    #     verbose_name='Рейтигн',
+    #     default=0,
+    # )
     description = models.TextField(
         verbose_name='Описание',
         blank=True,
@@ -119,9 +119,6 @@ class GenreTitle(models.Model):
         verbose_name='Жанр произведения',
         on_delete=models.CASCADE,
     )
-
-
-
 
 
 class Review(models.Model):
