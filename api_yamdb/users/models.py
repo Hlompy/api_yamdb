@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta
 
-import jwt
 from django.conf import settings
-from django.contrib.auth.models import (AbstractBaseUser, AbstractUser,
-                                        BaseUserManager, PermissionsMixin)
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -31,7 +29,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN
+        return self.role == self.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
