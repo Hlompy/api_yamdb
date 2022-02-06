@@ -53,32 +53,64 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     """Управление категориями произведений."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnlyPermission,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = []
+        else:
+            self.permission_classes = [IsAdminPermission, ]
+        return super(CategoryViewSet, self).get_permissions()
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
     """Управление категориями жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnlyPermission,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = []
+        else:
+            self.permission_classes = [IsAdminPermission, ]
+        return super(GenreViewSet, self).get_permissions()
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Управление произведениями."""
-    queryset = Title.objects.all()
+    # queryset = Title.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'category__slug', 'genre__slug')
+    filterset_fields = ('year',)
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'partial_update':
             return TitlePostSerializer
         return TitleGetSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = []
+        else:
+            self.permission_classes = [IsAdminPermission, ]
+        return super(TitleViewSet, self).get_permissions()
+
+    def get_queryset(self):
+        queryset = Title.objects.all()
+        genre = self.request.query_params.get('genre')
+        category = self.request.query_params.get('category')
+        name = self.request.query_params.get('name')
+        if genre:
+            queryset = queryset.filter(genre__slug=genre)
+        if category:
+            queryset = queryset.filter(category__slug=category)
+        if name:
+            queryset = queryset.filter(name__contains=name)
+        return queryset
