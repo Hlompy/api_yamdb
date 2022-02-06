@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,7 +19,7 @@ class UserSignupViewSet(viewsets.ViewSetMixin, generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = self.request.data.get('username')
@@ -37,7 +38,7 @@ class UserJSWTokenViewSet(viewsets.ViewSetMixin, generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.data['username']
@@ -59,8 +60,9 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminPermission,)
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
-
+    search_fields = ('username',)
     lookup_field = 'username'
 
     @action(
@@ -74,6 +76,6 @@ class UsersViewSet(viewsets.ModelViewSet):
             data=request.data,
             partial=True
         )
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=request.user.role, partial=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
