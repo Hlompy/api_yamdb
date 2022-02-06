@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import viewsets
 from rest_framework.pagination import (
     LimitOffsetPagination, PageNumberPagination,
 )
@@ -20,10 +20,6 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     """Управление категориями произведений."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = LimitOffsetPagination
-    lookup_field = 'slug'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -37,10 +33,6 @@ class GenreViewSet(ListCreateDestroyViewSet):
     """Управление категориями жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
-    lookup_field = 'slug'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -99,8 +91,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
 
-class CommentsPagination(PageNumberPagination):
-    page_size = 4
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Работа с комментариями."""
@@ -109,7 +99,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly,
         IsAuthorOrAdminOrModerator
     )
-    pagination_class = CommentsPagination
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
