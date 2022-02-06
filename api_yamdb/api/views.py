@@ -2,13 +2,13 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination,
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.mixins import ListCreateDestroyViewSet
-from api.permissions import (
-    IsAdminOrReadOnlyPermission, IsAdminPermission, IsAuthorOrAdminOrModerator,
-)
+from api.permissions import IsAdminPermission, IsAuthorOrAdminOrModerator
 from api.serializers import (
     CategorySerializer, CommentSerializer, GenreSerializer, ReviewSerializer,
     TitleGetSerializer, TitlePostSerializer,
@@ -69,7 +69,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         return super(TitleViewSet, self).get_permissions()
 
     def get_queryset(self):
-        queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+        queryset = Title.objects.all().annotate(
+            rating=Avg('reviews__score')).order_by('name')
         genre = self.request.query_params.get('genre')
         category = self.request.query_params.get('category')
         name = self.request.query_params.get('name')
@@ -98,6 +99,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
 
+class CommentsPagination(PageNumberPagination):
+    page_size = 4
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Работа с комментариями."""
@@ -106,6 +109,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly,
         IsAuthorOrAdminOrModerator
     )
+    pagination_class = CommentsPagination
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
