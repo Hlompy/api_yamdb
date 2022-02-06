@@ -185,7 +185,7 @@ class Comment(models.Model):
         db_index=True)
 
     class Meta:
-        ordering = ['pk']
+        ordering = ['pub_date']
 
     def __str__(self):
         return self.text
