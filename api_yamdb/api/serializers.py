@@ -24,10 +24,19 @@ class TitleGetSerializer(serializers.ModelSerializer):
     """Сериализатор вывода информации о произведениях."""
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
+    rating = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
@@ -41,10 +50,19 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug',
     )
+    rating = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
         validators = [
             UniqueTogetherValidator(
                 queryset=Title.objects.all(),
@@ -63,6 +81,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор отзывов на произведения."""
     author = serializers.SlugRelatedField(
         many=False,
         read_only=True,
@@ -84,8 +103,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор комментариев на отзывы."""
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True,
+        slug_field='username'
     )
 
     class Meta:
