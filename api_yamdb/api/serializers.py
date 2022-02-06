@@ -64,24 +64,23 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
-    title = serializers.SlugRelatedField(
         many=False,
-        slug_field='id',
-        read_only=True
+        read_only=True,
+        slug_field='username'
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('author', 'title'),
-                message='У вас уже есть отзыв к этому произведению'
-            )
-        ]
+
+    def validate(self, attrs):
+        is_exist = Review.objects.filter(
+            author=self.context['request'].user,
+            title=self.context['view'].kwargs.get('title_id')).exists()
+        if is_exist and self.context['request'].method == 'POST':
+            raise serializers.ValidationError(
+                'Пользователь уже оставлял отзыв на это произведение')
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -90,5 +89,5 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'author', 'text', 'pub_date')
         model = Comment
