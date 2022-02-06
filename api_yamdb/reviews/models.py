@@ -34,12 +34,12 @@ class Genre(models.Model):
     """Модель категории жанра."""
     name = models.CharField(
         verbose_name='Название',
-        max_length=200,
+        max_length=256,
         unique=True,
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
-        max_length=200,
+        max_length=50,
         unique=True,
     )
 
@@ -69,10 +69,6 @@ class Title(models.Model):
         blank=True,
         null=True,
     )
-    # rating = models.IntegerField(
-    #     verbose_name='Рейтигн',
-    #     default=0,
-    # )
     description = models.TextField(
         verbose_name='Описание',
         blank=True,

@@ -45,7 +45,6 @@ class TitlePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
-        # extra_qwargs = {'description': {'required': False}}
         validators = [
             UniqueTogetherValidator(
                 queryset=Title.objects.all(),
