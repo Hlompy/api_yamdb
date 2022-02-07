@@ -1,10 +1,11 @@
-from django.core.management.base import BaseCommand
-from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
-from users.models import User
-from api_yamdb.settings import BASE_DIR
 import csv
 import os
 
+from django.core.management.base import BaseCommand
+
+from api_yamdb.settings import BASE_DIR
+from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
+from users.models import User
 
 # Путь папки с импортируемыми файлами
 DATA_DIR = os.path.join(BASE_DIR, 'static', 'data')
@@ -72,99 +73,113 @@ class Command(BaseCommand):
             help='Импорт данных из comments.csv в БД Comment'
         )
 
+    def user_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                User.objects.create(
+                    id=row['id'],
+                    username=row['username'],
+                    email=row['email'],
+                    role=row['role'],
+                    bio=row['bio'],
+                    first_name=row['first_name'],
+                    last_name=row['last_name'],
+                )
+
+    def category_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                Category.objects.create(
+                    id=row['id'],
+                    name=row['name'],
+                    slug=row['slug'],
+                )
+
+    def genre_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                Genre.objects.create(
+                    id=row['id'],
+                    name=row['name'],
+                    slug=row['slug'],
+                )
+
+    def titles_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                Title.objects.create(
+                    id=row['id'],
+                    name=row['name'],
+                    year=row['year'],
+                    category_id=row['category'],
+                )
+
+    def genre_title_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                GenreTitle.objects.create(
+                    id=row['id'],
+                    title_id=row['title_id'],
+                    genre_id=row['genre_id'],
+                )
+
+    def review_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                Review.objects.create(
+                    id=row['id'],
+                    title_id=row['title_id'],
+                    text=row['text'],
+                    author_id=row['author'],
+                    score=row['score'],
+                    pub_date=row['pub_date'],
+                )
+
+    def comments_handle(self, file):
+        with open(file, mode='r', encoding="utf-8") as cvs_file:
+            dr = csv.DictReader(cvs_file)
+            for row in dr:
+                Comment.objects.create(
+                    id=row['id'],
+                    review_id=row['review_id'],
+                    text=row['text'],
+                    author_id=row['author'],
+                    pub_date=row['pub_date'],
+                )
+
     def handle(self, *args, **options):
         """Список действий для каждого аргумента."""
 
         # Пользователи
         if options['users']:
-            file = os.path.join(DATA_DIR, 'users.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    User.objects.create(
-                        id=row['id'],
-                        username=row['username'],
-                        email=row['email'],
-                        role=row['role'],
-                        bio=row['bio'],
-                        first_name=row['first_name'],
-                        last_name=row['last_name'],
-                    )
+            self.user_handle(os.path.join(DATA_DIR, 'users.csv'))
 
         # Категории (типы) произведений
         if options['category']:
-            file = os.path.join(DATA_DIR, 'category.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    Category.objects.create(
-                        id=row['id'],
-                        name=row['name'],
-                        slug=row['slug'],
-                    )
+            self.category_handle(os.path.join(DATA_DIR, 'category.csv'))
 
         # Категории жанров
         if options['genre']:
-            file = os.path.join(DATA_DIR, 'genre.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    Genre.objects.create(
-                        id=row['id'],
-                        name=row['name'],
-                        slug=row['slug'],
-                    )
+            self.genre_handle(os.path.join(DATA_DIR, 'genre.csv'))
 
         # Произведения, к которым пишут отзывы
         if options['titles']:
-            file = os.path.join(DATA_DIR, 'titles.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    Title.objects.create(
-                        id=row['id'],
-                        name=row['name'],
-                        year=row['year'],
-                        category_id=row['category'],
-                    )
+            self.titles_handle(os.path.join(DATA_DIR, 'titles.csv'))
 
         # Связь между произведениями и их жанрами
         if options['genre_title']:
-            file = os.path.join(DATA_DIR, 'genre_title.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    GenreTitle.objects.create(
-                        id=row['id'],
-                        title_id=row['title_id'],
-                        genre_id=row['genre_id'],
-                    )
+            self.genre_title_handle(os.path.join(DATA_DIR, 'genre_title.csv'))
 
         # Отзывы
         if options['review']:
-            file = os.path.join(DATA_DIR, 'review.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    Review.objects.create(
-                        id=row['id'],
-                        title_id=row['title_id'],
-                        text=row['text'],
-                        author_id=row['author'],
-                        score=row['score'],
-                        pub_date=row['pub_date'],
-                    )
+            self.review_handle(os.path.join(DATA_DIR, 'review.csv'))
 
         # Коментарии к отзывам
         if options['comments']:
-            file = os.path.join(DATA_DIR, 'comments.csv')
-            with open(file, mode='r', encoding="utf-8") as cvs_file:
-                dr = csv.DictReader(cvs_file)
-                for row in dr:
-                    Comment.objects.create(
-                        id=row['id'],
-                        review_id=row['review_id'],
-                        text=row['text'],
-                        author_id=row['author'],
-                        pub_date=row['pub_date'],
-                    )
+            self.comments_handle(os.path.join(DATA_DIR, 'comments.csv'))
