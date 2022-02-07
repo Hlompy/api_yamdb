@@ -2,16 +2,16 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-from rest_framework.pagination import (
-    LimitOffsetPagination, PageNumberPagination,
-)
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.pagination import LimitOffsetPagination
 
+from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
-from api.permissions import IsAdminPermission, IsAuthorOrAdminOrModerator
+from api.permissions import (
+    IsAdminOrReadOnlyPermission, IsAuthorOrAdminOrModeratorPermission,
+)
 from api.serializers import (
     CategorySerializer, CommentSerializer, GenreSerializer, ReviewSerializer,
-    TitleGetSerializer, TitlePostSerializer,
+    TitlePostSerializer, TitleSerializer,
 )
 from reviews.models import Category, Genre, Review, Title
 
@@ -20,68 +20,36 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     """Управление категориями произведений."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            self.permission_classes = []
-        else:
-            self.permission_classes = [IsAdminPermission, ]
-        return super(CategoryViewSet, self).get_permissions()
+    permission_classes = (IsAdminOrReadOnlyPermission, )
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
     """Управление категориями жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            self.permission_classes = []
-        else:
-            self.permission_classes = [IsAdminPermission, ]
-        return super(GenreViewSet, self).get_permissions()
+    permission_classes = (IsAdminOrReadOnlyPermission, )
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Управление произведениями."""
+    queryset = Title.objects.all().annotate(
+        rating=Avg('reviews__score')).order_by('name')
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('year',)
+    permission_classes = (IsAdminOrReadOnlyPermission, )
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'partial_update':
             return TitlePostSerializer
-        return TitleGetSerializer
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            self.permission_classes = []
-        else:
-            self.permission_classes = [IsAdminPermission, ]
-        return super(TitleViewSet, self).get_permissions()
-
-    def get_queryset(self):
-        queryset = Title.objects.all().annotate(
-            rating=Avg('reviews__score')).order_by('name')
-        genre = self.request.query_params.get('genre')
-        category = self.request.query_params.get('category')
-        name = self.request.query_params.get('name')
-        if genre:
-            queryset = queryset.filter(genre__slug=genre)
-        if category:
-            queryset = queryset.filter(category__slug=category)
-        if name:
-            queryset = queryset.filter(name__contains=name)
-        return queryset
+        return TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Работа с отзывами."""
     serializer_class = ReviewSerializer
-    permission_classes = (
-        IsAuthenticatedOrReadOnly,
-        IsAuthorOrAdminOrModerator
-    )
+    permission_classes = (IsAuthorOrAdminOrModeratorPermission,)
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -95,10 +63,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Работа с комментариями."""
     serializer_class = CommentSerializer
-    permission_classes = (
-        IsAuthenticatedOrReadOnly,
-        IsAuthorOrAdminOrModerator
-    )
+    permission_classes = (IsAuthorOrAdminOrModeratorPermission,)
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):

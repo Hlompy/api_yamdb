@@ -20,36 +20,10 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class TitleGetSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор вывода информации о произведениях."""
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    rating = serializers.FloatField(read_only=True)
-
-    class Meta:
-        model = Title
-        fields = (
-            'id',
-            'name',
-            'year',
-            'rating',
-            'description',
-            'genre',
-            'category',
-        )
-
-
-class TitlePostSerializer(serializers.ModelSerializer):
-    """Сериализатор записи информации о произведениях."""
-    category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(),
-        slug_field='slug',
-    )
-    genre = serializers.SlugRelatedField(
-        many=True,
-        queryset=Genre.objects.all(),
-        slug_field='slug',
-    )
     rating = serializers.FloatField(read_only=True)
 
     class Meta:
@@ -70,6 +44,20 @@ class TitlePostSerializer(serializers.ModelSerializer):
                 message='Такое произведение уже есть в базе'
             )
         ]
+
+
+class TitlePostSerializer(TitleSerializer):
+    """Сериализатор записи информации о произведениях."""
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug',
+    )
+    genre = serializers.SlugRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+    )
+    rating = serializers.FloatField(read_only=True)
 
     def validate_year(self, value):
         """Проверка, что год выпуска не привышает текущий."""
