@@ -3,6 +3,7 @@ from rest_framework import permissions
 
 class IsAdminOrReadOnlyPermission(permissions.BasePermission):
     """Права, разрешающие читать всем, а редактировать администраторам"""
+
     def has_permission(self, request, view):
         return bool(
             request.method in permissions.SAFE_METHODS
@@ -14,6 +15,7 @@ class IsAdminOrReadOnlyPermission(permissions.BasePermission):
 
 class IsAuthorOrAdminOrModeratorPermission(permissions.BasePermission):
     """Права, разрешающие редактировать пользователям и администрации"""
+
     def has_permission(self, request, view):
         return bool(
             request.method in permissions.SAFE_METHODS
@@ -36,6 +38,7 @@ class IsAuthorOrAdminOrModeratorPermission(permissions.BasePermission):
 
 class IsAdminPermission(permissions.BasePermission):
     """Права администратора."""
+
     def has_permission(self, request, view):
         return bool(
             request.user

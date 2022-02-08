@@ -1,7 +1,12 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone as tz
 
 from users.models import User
+
+
+def get_year():
+    return tz.now().year
 
 
 class Category(models.Model):
@@ -68,8 +73,15 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         'Год выпуска',
+        db_index=True,
         blank=True,
         null=True,
+        validators=[
+            MaxValueValidator(
+                get_year,
+                'Год выпуска не может быть больше текущего'
+            )
+        ]
     )
     description = models.TextField(
         'Описание',
@@ -149,7 +161,7 @@ class Review(models.Model):
         db_index=True)
 
     class Meta:
-        ordering = ('pub_date',)
+        ordering = ('-pub_date',)
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = [
@@ -185,7 +197,7 @@ class Comment(models.Model):
         db_index=True)
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text
