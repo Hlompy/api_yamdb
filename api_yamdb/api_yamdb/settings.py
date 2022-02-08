@@ -1,4 +1,5 @@
 import os
+<<<<<<< HEAD
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -7,13 +8,24 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+=======
+from datetime import timedelta
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
+
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+<<<<<<< HEAD
 
 # Application definition
 
+=======
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,6 +33,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+=======
+    'rest_framework',
+    'django_filters',
+    'rest_framework_simplejwt',
+    'reviews',
+    'users',
+    'api',
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 ]
 
 MIDDLEWARE = [
@@ -54,9 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
+<<<<<<< HEAD
 
 # Database
 
+=======
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -64,9 +88,12 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
 
 # Password validation
 
+=======
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -82,10 +109,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+<<<<<<< HEAD
 
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'
+=======
+LANGUAGE_CODE = 'ru-ru'
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
 
 TIME_ZONE = 'UTC'
 
@@ -95,9 +126,43 @@ USE_L10N = True
 
 USE_TZ = True
 
+<<<<<<< HEAD
 
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+=======
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+
+AUTH_USER_MODEL = 'users.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+EMAIL_ADMIN = 'admin@admin.ad'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+
+    'PAGE_SIZE': 5,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+>>>>>>> 2cfc4ab1c338e534e8085af8e20b901cd17b7e69
